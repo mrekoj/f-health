@@ -1,0 +1,17 @@
+{
+  "displayName": "Minh",
+  "addressAs": "anh",
+  "birthYear": 1988,
+  "sex": "male",
+  "heightCm": 172,
+  "weightGoalKg": 65,
+  "weightDirection": "keep",
+  "sleepGoalHours": 7,
+  "stepsGoal": 7000,
+  "conditions": "Ví dụ: trào ngược dạ dày nhẹ\nNgủ hay thức giữa đêm",
+  "doctorNotes": "Ví dụ: hạn chế rượu bia, ăn tối trước 19h30.",
+  "dietNotes": "Ví dụ: chia 5 bữa nhỏ, ít đồ cay.",
+  "medications": "",
+  "lifestyleNotes": "Ví dụ: làm văn phòng, đi bộ 15 phút sau bữa tối.",
+  "updatedAt": "2026-01-01T00:00:00Z"
+}

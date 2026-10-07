@@ -1,0 +1,79 @@
+name: BBHealth
+# Team, bundle id, tên app, Google Client ID: KHÔNG đặt ở đây — xem Config/Base.xcconfig và
+# Config/Local.xcconfig (file riêng của từng người, gitignore; mẫu Config/Local.xcconfig.example).
+options:
+  developmentLanguage: vi
+  deploymentTarget:
+    iOS: "17.0"
+settings:
+  base:
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.9"
+    GENERATE_INFOPLIST_FILE: YES
+    CODE_SIGN_STYLE: Automatic
+targets:
+  BBHealth:
+    type: application
+    platform: iOS
+    sources:
+      - Sources/BBHealth
+      - Resources/Assets.xcassets
+      # Hồ sơ riêng (OwnerProfile.json, gitignore) — có file thì app nạp làm hồ sơ mặc định.
+      - path: Resources/Private
+        optional: true
+        excludes: ["*.example.json", "README.md"]
+    configFiles:
+      Debug: Config/Base.xcconfig
+      Release: Config/Base.xcconfig
+    settings:
+      base:
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_CFBundleDisplayName: $(APP_DISPLAY_NAME)
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
+        TARGETED_DEVICE_FAMILY: "1"
+      # Ký tự động (Automatic) cho cả Debug/Release → Archive trong Xcode là chạy.
+      # scripts/release-testflight.sh tự truyền ký tay (Manual + profile App Store) khi archive bằng dòng lệnh.
+    # HealthKit: chỉ đọc (ngủ, nhịp tim nghỉ, bước, cân) + ghi cân nặng.
+    entitlements:
+      path: Resources/BBHealth.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.access: []
+        # Theo dõi nền: iOS đánh thức app khi có phiên ngủ mới → tự lưu giấc ngủ trưa.
+        com.apple.developer.healthkit.background-delivery: true
+    info:
+      path: Resources/Info.plist
+      properties:
+        CFBundleDisplayName: $(APP_DISPLAY_NAME)
+        CFBundleLocalizations: [vi]
+        ITSAppUsesNonExemptEncryption: false
+        LSApplicationCategoryType: "public.app-category.healthcare-fitness"
+        NSHealthShareUsageDescription: "BBHealth đọc giấc ngủ, nhịp tim nghỉ, số bước và cân nặng từ ứng dụng Sức khoẻ để hiển thị bằng tiếng Việt theo ngưỡng riêng của bạn."
+        NSHealthUpdateUsageDescription: "BBHealth ghi cân nặng bạn nhập vào ứng dụng Sức khoẻ để theo dõi xu hướng tăng cân."
+        # T-021: nhịp tim trực tiếp qua Bluetooth (Heart Rate Profile) từ vòng Fitbit — chỉ khi app đang mở.
+        NSBluetoothAlwaysUsageDescription: "BBHealth dùng Bluetooth để đọc nhịp tim trực tiếp từ vòng Fitbit khi bạn bật Chia sẻ nhịp tim trên vòng."
+        # Nguồn thứ hai (tuỳ chọn): Google Health API. Dán Client ID trong Cài đặt, hoặc đặt
+        # GOOGLE_HEALTH_CLIENT_ID trong Config/Local.xcconfig để nạp sẵn.
+        GoogleHealthClientID: $(GOOGLE_HEALTH_CLIENT_ID)
+        # Thư mục app hiện trong app Tệp (health.csv + báo cáo .md).
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        # Đăng nhập Google mở qua ASWebAuthenticationSession; scheme của app cho OAuth callback.
+        CFBundleURLTypes:
+          - CFBundleURLName: $(PRODUCT_BUNDLE_IDENTIFIER)
+            CFBundleURLSchemes: [$(PRODUCT_BUNDLE_IDENTIFIER)]
+schemes:
+  BBHealth:
+    build:
+      targets:
+        BBHealth: all
+    run:
+      config: Debug
+      environmentVariables:
+        # Trên simulator app tự dùng dữ liệu giả; đặt BBH_MOCK=1 để ép dùng số giả trên iPhone thật.
+        BBH_MOCK: "0"
+    archive:
+      config: Release

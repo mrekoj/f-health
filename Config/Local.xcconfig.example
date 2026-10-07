@@ -1,0 +1,18 @@
+// Mẫu cấu hình RIÊNG của bạn. Cách dùng:
+//   cp Config/Local.xcconfig.example Config/Local.xcconfig
+// rồi sửa các dòng dưới. Config/Local.xcconfig nằm trong .gitignore — KHÔNG commit.
+// Sửa xong chạy lại: xcodegen generate
+
+// Team ID Apple của bạn (10 ký tự) — Xcode → Settings → Accounts, hoặc developer.apple.com → Membership.
+DEVELOPMENT_TEAM = ABCDE12345
+
+// Bundle id RIÊNG (mỗi người một cái, không trùng app người khác). Vd com.tencongty.bbhealth
+PRODUCT_BUNDLE_IDENTIFIER = com.yourname.bbhealth
+
+// Tên hiện dưới biểu tượng app.
+APP_DISPLAY_NAME = BBHealth
+
+// (Tuỳ chọn) Google OAuth Client ID loại iOS — xem docs/GOOGLE-HEALTH-SETUP.md.
+// Để trống thì dán trong app: Cài đặt → Google Health.
+// Lưu ý: trong .xcconfig, "//" là chú thích — Client ID không có "//" nên dán thẳng được.
+GOOGLE_HEALTH_CLIENT_ID =

@@ -1,0 +1,22 @@
+.DS_Store
+build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+__pycache__/
+.claude/settings.local.json
+
+# Project Xcode do xcodegen sinh từ project.yml — không commit.
+*.xcodeproj/
+
+# ===== DỮ LIỆU RIÊNG — KHÔNG BAO GIỜ COMMIT =====
+# Team / bundle id / Google Client ID của từng người.
+Config/Local.xcconfig
+# Hồ sơ sức khoẻ thật (giữ lại README + file mẫu).
+Resources/Private/*
+!Resources/Private/README.md
+!Resources/Private/OwnerProfile.example.json
+# Khoá App Store Connect, biến môi trường.
+*.p8
+.env
+.env.*

@@ -1,0 +1,11 @@
+// Cấu hình chung — ĐƯỢC commit. KHÔNG sửa file này để đặt Team/bundle của bạn:
+// copy Config/Local.xcconfig.example → Config/Local.xcconfig rồi sửa ở đó (file đó nằm trong .gitignore).
+
+// Giá trị mặc định (đủ để build simulator, không cần tài khoản Apple).
+APP_DISPLAY_NAME = BBHealth
+PRODUCT_BUNDLE_IDENTIFIER = com.example.bbhealth
+DEVELOPMENT_TEAM =
+GOOGLE_HEALTH_CLIENT_ID =
+
+// Ghi đè bằng file riêng nếu có (dấu ? = không có file cũng không lỗi).
+#include? "Local.xcconfig"
