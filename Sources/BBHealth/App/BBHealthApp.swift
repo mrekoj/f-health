@@ -224,6 +224,15 @@ enum DebugOptions {
         #endif
     }
 
+    /// Ép hiện màn Chào mừng (onboarding) dù hồ sơ đã có (chụp màn hình): `-BBHOnboarding YES`.
+    static var showOnboarding: Bool {
+        #if DEBUG
+        return defaults.bool(forKey: "BBHOnboarding")
+        #else
+        return false
+        #endif
+    }
+
     /// Mở sẵn màn Lịch sử giấc ngủ (chụp màn hình).
     static var showSleepHistory: Bool {
         #if DEBUG
