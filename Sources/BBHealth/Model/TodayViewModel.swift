@@ -80,16 +80,22 @@ final class TodayViewModel {
 
     /// 1 câu tóm tắt dễ hiểu cho cả ngày.
     var summary: String {
+        // Xưng hô + lời khuyên ăn theo hồ sơ; hồ sơ trống → "bạn" và lời khuyên chung (không "6 bữa").
+        let profile = HealthProfileStore.current
+        let you = profile.you
         var first: String
         switch sleepLevel {
-        case .good: first = "Đêm qua anh ngủ đủ giấc"
-        case .caution: first = "Đêm qua anh ngủ hơi thiếu"
-        case .bad: first = "Đêm qua anh ngủ ít"
+        case .good: first = "Đêm qua \(you) ngủ đủ giấc"
+        case .caution: first = "Đêm qua \(you) ngủ hơi thiếu"
+        case .bad: first = "Đêm qua \(you) ngủ ít"
         case .unknown: first = "Chưa có số giấc ngủ đêm qua"
         }
-        let eat = bodyMassLevel == .good
-            ? "giữ đều 6\u{00A0}bữa"
-            : "ăn đủ 6\u{00A0}bữa nhỏ"
+        let eat: String
+        if !profile.isEmpty && profile.weightDirection == .gain {
+            eat = bodyMassLevel == .good ? "giữ đều 6\u{00A0}bữa" : "ăn đủ 6\u{00A0}bữa nhỏ"
+        } else {
+            eat = "ăn đúng bữa"
+        }
         let bed = sleepLevel == .good ? "giữ giờ ngủ trước 23h" : "lên giường trước 23h"
         return "\(first) — hôm nay nên \(eat) và \(bed)."
     }
@@ -216,7 +222,7 @@ final class TodayViewModel {
         }
     }
 
-    /// Đoạn "Của anh hôm nay" trong sheet giải thích.
+    /// Đoạn "Của bạn hôm nay" trong sheet giải thích.
     func todayNote(for metric: Metric) -> String {
         switch metric {
         case .sleep:

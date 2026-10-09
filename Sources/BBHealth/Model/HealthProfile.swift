@@ -85,6 +85,12 @@ struct HealthProfile: Codable, Equatable {
     /// true khi người dùng chưa điền tên — màn Hôm nay mời điền hồ sơ.
     var isEmpty: Bool { displayName.trimmingCharacters(in: .whitespaces).isEmpty }
 
+    /// Cách gọi người dùng trong câu ("anh"/"chị"/"bạn"…); hồ sơ trống → "bạn".
+    var you: String {
+        let a = addressAs.trimmingCharacters(in: .whitespaces)
+        return isEmpty || a.isEmpty ? "bạn" : a
+    }
+
     /// Hồ sơ trống cho người dùng mới (chỉ giữ mục tiêu chung).
     static let blank = HealthProfile(
         displayName: "", addressAs: "bạn", birthYear: 1990, sex: .other, heightCm: nil,
@@ -137,11 +143,16 @@ final class ProfileSettings {
 
     var profile: HealthProfile {
         didSet {
-            guard profile != oldValue else { return }
+            // @Observable biến `profile` thành thuộc tính tính toán → gán lại trong didSet sẽ gọi lại
+            // didSet (khác struct thường). Không chặn thì `updatedAt = Date()` đệ quy tới tràn stack (crash khi lưu hồ sơ).
+            guard !isStamping, profile != oldValue else { return }
+            isStamping = true
             profile.updatedAt = Date()
+            isStamping = false
             HealthProfileStore.save(profile)
         }
     }
+    @ObservationIgnored private var isStamping = false
 
     init() { profile = HealthProfileStore.current }
 
