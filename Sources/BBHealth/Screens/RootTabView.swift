@@ -4,6 +4,7 @@ import SwiftUI
 struct RootTabView: View {
     @State private var tab = DebugOptions.initialTab
     @State private var pending = PendingNavigation.shared
+    @State private var showOnboarding = OnboardingState.shouldShow
 
     var body: some View {
         TabView(selection: $tab) {
@@ -26,6 +27,10 @@ struct RootTabView: View {
         .tint(Theme.brand)
         // Chạm thông báo "Báo cáo tuần" → sang Xu hướng (TrendsView tự mở Báo cáo tuần).
         .onChange(of: pending.openWeeklyReport) { if pending.openWeeklyReport { tab = "trends" } }
+        // Lần đầu mở (hồ sơ trống): màn Chào mừng 4 bước (T-034).
+        .fullScreenCover(isPresented: $showOnboarding) {
+            OnboardingView { showOnboarding = false }
+        }
     }
 }
 

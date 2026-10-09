@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Sheet giải thích một chỉ số: "Chỉ số này là gì" · "Của anh hôm nay" · "BS dặn" · "Gợi ý".
+/// Sheet giải thích một chỉ số: "Chỉ số này là gì" · "Của bạn hôm nay" (xưng theo hồ sơ) · "BS dặn" · "Gợi ý".
 struct ExplanationSheet: View {
     let metric: Metric
     let value: String
@@ -21,7 +21,7 @@ struct ExplanationSheet: View {
                             .foregroundStyle(Theme.textPrimary)
                             .lineSpacing(3)
                     }
-                    section(title: "Của anh hôm nay", symbol: "person.crop.circle.fill", tint: metric.tint) {
+                    section(title: "Của \(HealthProfileStore.current.you) hôm nay", symbol: "person.crop.circle.fill", tint: metric.tint) {
                         VStack(alignment: .leading, spacing: 12) {
                             Text(todayNote)
                                 .font(.body)

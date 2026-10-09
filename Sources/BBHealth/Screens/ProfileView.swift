@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Màn **Hồ sơ của tôi** (T-025): tuổi, mục tiêu, bệnh nền, BS dặn… — vừa chỉnh ngưỡng màu trong app,
 /// vừa là phần "Hồ sơ" gửi kèm cho AI. Mặc định trống (hoặc nạp từ Resources/Private/OwnerProfile.json).
@@ -8,6 +9,8 @@ struct ProfileView: View {
     @State private var confirmReset = false
     @State private var confirmClear = false
     @State private var showingWhy = false
+    @State private var showingImporter = false
+    @State private var importMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -53,6 +56,13 @@ struct ProfileView: View {
                 Button("Thôi", role: .cancel) {}
             } message: { Text("Dành cho người dùng mới tự điền hồ sơ của mình.") }
             .sheet(isPresented: $showingWhy) { whySheet }
+            .fileImporter(isPresented: $showingImporter, allowedContentTypes: [.json]) { result in
+                importProfile(from: result)
+            }
+            .alert("Nhập hồ sơ", isPresented: Binding(get: { importMessage != nil },
+                                                      set: { if !$0 { importMessage = nil } })) {
+                Button("Xong", role: .cancel) {}
+            } message: { Text(importMessage ?? "") }
         }
     }
 
@@ -170,17 +180,51 @@ struct ProfileView: View {
     }
 
     private var resetButtons: some View {
-        HStack(spacing: 10) {
-            Button { confirmReset = true } label: {
-                Label("Về mặc định", systemImage: "arrow.counterclockwise").frame(maxWidth: .infinity)
+        VStack(spacing: 10) {
+            Button { showingImporter = true } label: {
+                Label("Nhập hồ sơ từ tệp JSON", systemImage: "square.and.arrow.down").frame(maxWidth: .infinity)
             }
-            .buttonStyle(.bordered).tint(Theme.brand)
-            Button { confirmClear = true } label: {
-                Label("Xoá trắng", systemImage: "trash").frame(maxWidth: .infinity)
+            .buttonStyle(.bordered).tint(Theme.good)
+            HStack(spacing: 10) {
+                Button { confirmReset = true } label: {
+                    Label("Về mặc định", systemImage: "arrow.counterclockwise").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered).tint(Theme.brand)
+                Button { confirmClear = true } label: {
+                    Label("Xoá trắng", systemImage: "trash").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered).tint(Theme.improve)
             }
-            .buttonStyle(.bordered).tint(Theme.improve)
+            Text("Nhập từ JSON: chọn tệp hồ sơ đã lưu (ví dụ OwnerProfile.json) để khôi phục nhanh toàn bộ hồ sơ của bạn.")
+                .font(.footnote).foregroundStyle(Theme.textTertiary)
+                .frame(maxWidth: .infinity).multilineTextAlignment(.center)
         }
         .controlSize(.large)
+    }
+
+    /// Nạp hồ sơ từ tệp JSON người dùng chọn (đúng định dạng HealthProfile; ngày kiểu ISO-8601 hoặc số).
+    private func importProfile(from result: Result<URL, Error>) {
+        switch result {
+        case .failure(let e):
+            importMessage = "Không mở được tệp: \(e.localizedDescription)"
+        case .success(let url):
+            let access = url.startAccessingSecurityScopedResource()
+            defer { if access { url.stopAccessingSecurityScopedResource() } }
+            guard let data = try? Data(contentsOf: url) else {
+                importMessage = "Không đọc được nội dung tệp."
+                return
+            }
+            let iso = JSONDecoder(); iso.dateDecodingStrategy = .iso8601
+            if let p = try? iso.decode(HealthProfile.self, from: data) {
+                settings.profile = p
+                importMessage = "Đã nhập hồ sơ của \(p.displayName.isEmpty ? "bạn" : p.displayName)."
+            } else if let p = try? JSONDecoder().decode(HealthProfile.self, from: data) {
+                settings.profile = p
+                importMessage = "Đã nhập hồ sơ của \(p.displayName.isEmpty ? "bạn" : p.displayName)."
+            } else {
+                importMessage = "Tệp không đúng định dạng hồ sơ. Hãy chọn tệp JSON xuất từ app (OwnerProfile.json)."
+            }
+        }
     }
 
     private var whySheet: some View {
